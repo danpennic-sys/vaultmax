@@ -3,12 +3,10 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-# This workflow lets you generate SLSA provenance file for your project.
-# The generation satisfies level 3 for the provenance requirements - see https://slsa.dev/spec/v0.1/requirements
-# The project is an initiative of the OpenSSF (openssf.org) and is developed at
-# https://github.com/slsa-framework/slsa-github-generator.
-# The provenance file can be verified using https://github.com/slsa-framework/slsa-verifier.
-# For more information about SLSA and how it improves the supply-chain, visit slsa.dev.
+# Generate SLSA provenance for a deterministic git archive of this commit.
+# Provenance level 3: https://slsa.dev/spec/v0.1/requirements
+# Generator: https://github.com/slsa-framework/slsa-github-generator
+# Verifier: https://github.com/slsa-framework/slsa-verifier
 
 name: SLSA generic generator
 on:
@@ -19,39 +17,39 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write # upload-artifact
     outputs:
-      # Must match the GITHUB_OUTPUT key written by steps.hash (hashes, not digests)
+      # Must match the GITHUB_OUTPUT key written by steps.hash (hashes, not digests).
       hashes: ${{ steps.hash.outputs.hashes }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
-      # ========================================================
-      #
-      # Step 1: Build your artifacts.
-      #
-      # ========================================================
-      - name: Build artifacts
+      # git archive is deterministic for this commit and includes only tracked files.
+      - name: Build source artifact
         run: |
-            # Placeholder artifacts for provenance smoke test.
-            # Replace with real build outputs (e.g. wheels, binaries).
-            echo "artifact1" > artifact1
-            echo "artifact2" > artifact2
+          set -euo pipefail
+          mkdir -p dist
+          short="${GITHUB_SHA::8}"
+          git archive --format=tar.gz \
+            --prefix="vaultmax-${short}/" \
+            -o "dist/vaultmax-${short}.tar.gz" HEAD
 
-      # ========================================================
-      #
-      # Step 2: Generate the provenance subjects (sha256, base64).
-      #
-      # ========================================================
       - name: Generate subject for provenance
         id: hash
         run: |
           set -euo pipefail
+          cd dist
+          # Key name MUST be hashes. One line: "<sha256>  <filename>".
+          echo "hashes=$(sha256sum -- * | base64 -w0)" >> "${GITHUB_OUTPUT}"
 
-          # List the artifacts the provenance will refer to.
-          files=$(ls artifact*)
-          # Generate the subjects (base64 encoded). Key name MUST be hashes.
-          echo "hashes=$(sha256sum $files | base64 -w0)" >> "${GITHUB_OUTPUT}"
+      - uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
+        with:
+          name: vaultmax-dist
+          path: dist/*
+          if-no-files-found: error
 
   provenance:
     needs: [build]
