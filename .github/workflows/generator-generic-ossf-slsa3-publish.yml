@@ -20,7 +20,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     outputs:
-      digests: ${{ steps.hash.outputs.digests }}
+      # Must match the GITHUB_OUTPUT key written by steps.hash (hashes, not digests)
+      hashes: ${{ steps.hash.outputs.hashes }}
 
     steps:
       - uses: actions/checkout@v4
@@ -32,16 +33,14 @@ jobs:
       # ========================================================
       - name: Build artifacts
         run: |
-            # These are some amazing artifacts.
+            # Placeholder artifacts for provenance smoke test.
+            # Replace with real build outputs (e.g. wheels, binaries).
             echo "artifact1" > artifact1
             echo "artifact2" > artifact2
 
       # ========================================================
       #
-      # Step 2: Add a step to generate the provenance subjects
-      #         as shown below. Update the sha256 sum arguments
-      #         to include all binaries that you generate
-      #         provenance for.
+      # Step 2: Generate the provenance subjects (sha256, base64).
       #
       # ========================================================
       - name: Generate subject for provenance
@@ -51,7 +50,7 @@ jobs:
 
           # List the artifacts the provenance will refer to.
           files=$(ls artifact*)
-          # Generate the subjects (base64 encoded).
+          # Generate the subjects (base64 encoded). Key name MUST be hashes.
           echo "hashes=$(sha256sum $files | base64 -w0)" >> "${GITHUB_OUTPUT}"
 
   provenance:
@@ -62,5 +61,7 @@ jobs:
       contents: write # To add assets to a release.
     uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@v2
     with:
-      base64-subjects: "${{ needs.build.outputs.digests }}"
-      upload-assets: true # Optional: Upload to a new release
+      base64-subjects: "${{ needs.build.outputs.hashes }}"
+      # Only upload release assets on tag/release runs; avoids dispatch failures
+      # that require upload-tag-name when not on a tag ref.
+      upload-assets: ${{ startsWith(github.ref, 'refs/tags/') }}
