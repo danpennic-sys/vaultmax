@@ -1,0 +1,38 @@
+                    GNU AFFERO GENERAL PUBLIC LICENSE
+                       Version 3, 19 November 2007
+
+ Copyright (C) 2026 VaultMax Contributors
+
+ VaultMax Core is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published
+ by the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ The full text of the GNU AGPL v3: https://www.gnu.org/licenses/agpl-3.0.txt
+
+WHAT THIS MEANS FOR YOU:
+
+  FREE to use, study, distribute — including commercially.
+
+  ONE KEY CONDITION: If you modify VaultMax Core and run it as a
+  networked service accessible to others, you MUST release your
+  modified source under AGPL v3. This applies even without distributing
+  a binary. This is the AGPL "network use = distribution" clause.
+
+  CANNOT COMPLY? A commercial license is available: legal@vaultmax.io
+
+SCOPE:
+
+  AGPL covers (VaultMax Core):   vault_core.py  |  max_headroom.py
+
+  Commercial license required:   node_hardening.py  |  rotation_scheduler.py
+                                  network_healing.py |  reset_15.py
+                                  self_designing.py
+
+EXPORT CONTROL: ECCN 5E002. Not for export to embargoed destinations.
+See VaultMax_Export_Control_Checklist.docx for full compliance guidance.
+
+CONTRIBUTORS: By contributing you agree VaultMax may relicense your
+contributions commercially. Contributor agreement required before merge.
+
+VaultMax — legal@vaultmax.io
