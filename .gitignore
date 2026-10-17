@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+vaultmax_pki/
+*.log
+max_memory.log
+.DS_Store
+*.key
+*.pem
