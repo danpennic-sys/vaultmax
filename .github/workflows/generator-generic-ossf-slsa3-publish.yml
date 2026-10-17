@@ -66,3 +66,5 @@ jobs:
       # Only upload release assets on tag/release runs; avoids dispatch failures
       # that require upload-tag-name when not on a tag ref.
       upload-assets: ${{ startsWith(github.ref, 'refs/tags/') }}
+      # Private repo opt-in. Publishes repo name, ref, and subject names to public Rekor.
+      private-repository: true
